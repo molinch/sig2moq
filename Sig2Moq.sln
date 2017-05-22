@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.26403.7
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sig2Moq.Vsix", "Sig2Moq.Vsix\Sig2Moq.Vsix.csproj", "{C8A0A15F-C17A-4CA1-89AF-5DACDFD376F8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sig2Moq", "Sig2Moq\Sig2Moq.csproj", "{AF27CB26-21C6-42E5-8F73-4E2FB9B1CFC1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Demo", "Demo\Demo.csproj", "{4056A291-1CC5-4B5D-AAD9-C859E3F4BF6E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C8A0A15F-C17A-4CA1-89AF-5DACDFD376F8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C8A0A15F-C17A-4CA1-89AF-5DACDFD376F8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C8A0A15F-C17A-4CA1-89AF-5DACDFD376F8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C8A0A15F-C17A-4CA1-89AF-5DACDFD376F8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AF27CB26-21C6-42E5-8F73-4E2FB9B1CFC1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AF27CB26-21C6-42E5-8F73-4E2FB9B1CFC1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AF27CB26-21C6-42E5-8F73-4E2FB9B1CFC1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AF27CB26-21C6-42E5-8F73-4E2FB9B1CFC1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4056A291-1CC5-4B5D-AAD9-C859E3F4BF6E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4056A291-1CC5-4B5D-AAD9-C859E3F4BF6E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4056A291-1CC5-4B5D-AAD9-C859E3F4BF6E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4056A291-1CC5-4B5D-AAD9-C859E3F4BF6E}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

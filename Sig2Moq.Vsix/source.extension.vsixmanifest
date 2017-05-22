@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
+  <Metadata>
+    <Identity Id="sig2moq.22dfbe3c-03c7-4ea9-afbe-ce0dcb859246" Version="0.2" Language="en-US" Publisher="molinch"/>
+    <DisplayName>Member signature to Moq definition</DisplayName>
+    <Description xml:space="preserve">Allows to extract Moq setup from member signatures (methods or properties)</Description>
+    <MoreInfo>https://github.com/molinch/sig2moq</MoreInfo>
+    <License>LICENSE.txt</License>
+    <Tags>csharp roslyn moq</Tags>
+  </Metadata>
+  <Installation>
+    <InstallationTarget Version="[14.0,15.0]" Id="Microsoft.VisualStudio.Pro" />
+    <InstallationTarget Version="[15.0,16.0)" Id="Microsoft.VisualStudio.Community" />
+    <InstallationTarget Version="[14.0,15.0]" Id="Microsoft.VisualStudio.Enterprise" />
+  </Installation>
+  <Dependencies>
+    <Dependency Id="Microsoft.Framework.NDP" DisplayName="Microsoft .NET Framework" d:Source="Manual" Version="4.5.2" />
+  </Dependencies>
+  <Assets>
+    <Asset Type="Microsoft.VisualStudio.MefComponent" d:Source="Project" Path="|Sig2Moqx|" d:ProjectName="Sig2Moqx" />
+  </Assets>
+  <Prerequisites>
+    <Prerequisite Id="Microsoft.Net.Component.4.5.TargetingPack" Version="[15.0.26208.0,16.0)" DisplayName=".NET Framework 4.5 targeting pack" />
+  </Prerequisites>
+</PackageManifest>
