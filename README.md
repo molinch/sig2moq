@@ -15,7 +15,7 @@ Member signature to Moq definition
 - Setter
 - Protected
 
-## And others...
+## And others... 
 
-- Verify method called
-- Verify property called
+- Verify method called (in progress)
+- Verify property called (in progress)
