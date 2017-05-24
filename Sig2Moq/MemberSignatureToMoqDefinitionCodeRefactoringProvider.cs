@@ -10,7 +10,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
 using System.Windows.Forms;
 
-namespace MoveClassToFile
+namespace Sig2Moq
 {
     [ExportCodeRefactoringProvider(RefactoringId, LanguageNames.CSharp), Shared]
     internal class MemberSignatureToMoqDefinitionCodeRefactoringProvider : CodeRefactoringProvider
@@ -22,125 +22,54 @@ namespace MoveClassToFile
             var root = await context.Document.GetSyntaxRootAsync(context.CancellationToken).ConfigureAwait(false);
             var node = root.FindNode(context.Span);
 
-            if (node is MethodDeclarationSyntax || node is PropertyDeclarationSyntax)
+            if (node is MethodDeclarationSyntax methodNode)
             {
-                var action = CodeAction.Create("Extract Moq setup definition", c => ExtractMoqSetupDefinitionAsync(context.Document, (MemberDeclarationSyntax)node, c));
+                var action = CodeAction.Create("Extract Moq setup definition", c => MethodDeclaration(context.Document, c, methodNode));
                 context.RegisterRefactoring(action);
             }
-        }
-
-        private static async Task<Document> ExtractMoqSetupDefinitionAsync(Document document, MemberDeclarationSyntax member, CancellationToken cancellationToken)
-        {
-            var semanticModel = await document.GetSemanticModelAsync(cancellationToken);
-
-            var method = member as MethodDeclarationSyntax;
-            if (method != null)
+            else if (node is PropertyDeclarationSyntax propNode)
             {
-                MethodDeclaration(method);
+                var actionGet = CodeAction.Create("Extract GET Moq setup definition", c => PropertyDeclaration(context.Document, c, propNode, false));
+                context.RegisterRefactoring(actionGet);
+
+                var actionSet = CodeAction.Create("Extract SET Moq setup definition", c => PropertyDeclaration(context.Document, c, propNode, true));
+                context.RegisterRefactoring(actionSet);
             }
-            else
+            else if (node is AccessorDeclarationSyntax accessorNode)
             {
-                var property = member as PropertyDeclarationSyntax;
-                if (property != null)
+                var kind = accessorNode.Kind();
+                if (kind == SyntaxKind.GetAccessorDeclaration || kind == SyntaxKind.SetAccessorDeclaration)
                 {
-                    PropertyDeclaration(property);
+                    var action = CodeAction.Create("Extract Moq setup definition", c => PropertyAccessorDeclaration(context.Document, c, accessorNode, kind));
+                    context.RegisterRefactoring(action);
                 }
             }
-
-            return document;
-        }
-
-        private static void MethodDeclaration(MethodDeclarationSyntax method)
-        {
-            var predefinedReturnType = method.ReturnType as PredefinedTypeSyntax;
-            bool isVoid = predefinedReturnType != null && predefinedReturnType.Keyword.Kind() == SyntaxKind.VoidKeyword;
-
-            bool hasRefParameter = false;
-            string refOutVariableDefinition = "";
-            string ret = "";
-            string args = "";
-            foreach (var parameter in method.ParameterList.Parameters)
-            {
-                if (args != "")
-                {
-                    args += ", ";
-                    ret += ", ";
-                }
-
-                string type = parameter.Type.ToString();
-                string variableName = parameter.Identifier.ValueText;
-
-                bool specialModifier = false;
-                var modifier = parameter.Modifiers.FirstOrDefault();
-                if (modifier != null)
-                {
-                    var modifierKind = modifier.Kind();
-                    if (modifierKind == SyntaxKind.RefKeyword || modifierKind == SyntaxKind.OutKeyword)
-                    {
-                        if (refOutVariableDefinition != "")
-                        {
-                            refOutVariableDefinition += Environment.NewLine;
-                        }
-                        
-                        args += $"{modifier.ValueText} {variableName}";
-                        specialModifier = true;
-                    }
-                    if (modifierKind == SyntaxKind.RefKeyword)
-                    {
-                        refOutVariableDefinition += $"{type} {variableName} = default({type});";
-                        hasRefParameter = true;
-                    }
-                    else if (modifierKind == SyntaxKind.OutKeyword)
-                    {
-                        refOutVariableDefinition += $"{type} {variableName};";
-                    }
-
-                    if (specialModifier)
-                    {
-                        variableName = "p" + variableName;
-                    }
-                }
-                
-                if (!specialModifier)
-                {
-                    args += $"It.IsAny<{type}>()";
-                }
-
-                ret += $"{type} {variableName}";
-            }
-
-            string returnCallbackText = isVoid ? "Callback" : "Returns";
-            var mockSetup =
-                        $"mock.Setup(m => m.{method.Identifier.ValueText}({args}))" + Environment.NewLine +
-                        $".{returnCallbackText}(({ret}) =>" + Environment.NewLine +
-                            "{" + Environment.NewLine + (isVoid ? "" : $"return default({predefinedReturnType});") + Environment.NewLine + "});";
-
-            if (!string.IsNullOrEmpty(refOutVariableDefinition))
-            {
-                mockSetup = refOutVariableDefinition + Environment.NewLine + mockSetup;
-            }
-
-            if (hasRefParameter)
-            {
-                const string refWarning = "// Warning: if the parameter passed by reference is not the exact same instance, then the mocked method will never get called";
-                mockSetup = refWarning + Environment.NewLine + mockSetup;
-            }
-
-            CopyToClipboard(mockSetup);
-        }
-
-        private static void PropertyDeclaration(PropertyDeclarationSyntax property)
-        {
-            var predefinedReturnType = property.Type as PredefinedTypeSyntax;
-            
-            var mockSetup =
-                        $"mock.Setup(m => m.{property.Identifier.ValueText})" + Environment.NewLine +
-                        $".Returns(() =>" + Environment.NewLine +
-                            "{" + Environment.NewLine + $"return default({predefinedReturnType});" + Environment.NewLine + "});";
-
-            CopyToClipboard(mockSetup);
         }
         
+        private static Task<Document> MethodDeclaration(Document document, CancellationToken cancellationToken, MethodDeclarationSyntax method)
+        {
+            var methodInfo = new DisplayableMethodInformation(method);
+            CopyToClipboard(methodInfo.MoqDefinition);
+            return Task.FromResult(document);
+        }
+
+        private static Task<Document> PropertyDeclaration(Document document, CancellationToken cancellationToken, PropertyDeclarationSyntax property, bool isSetter)
+        {
+            var propInfo = new DisplayablePropertyInformation(property, isSetter);
+            CopyToClipboard(propInfo.MoqDefinition);
+            return Task.FromResult(document);
+        }
+
+        private static Task<Document> PropertyAccessorDeclaration(Document document, CancellationToken cancellationToken, AccessorDeclarationSyntax propertyAccessor, SyntaxKind kind)
+        {
+            var ancestor = propertyAccessor.FirstAncestorOrSelf<PropertyDeclarationSyntax>();
+            if (ancestor != null)
+            {
+                PropertyDeclaration(document, cancellationToken, ancestor, kind == SyntaxKind.SetAccessorDeclaration);
+            }
+            return Task.FromResult(document);
+        }
+
         private static void CopyToClipboard(string text)
         {
             var thread = new Thread(() => Clipboard.SetText(text));

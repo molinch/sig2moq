@@ -1,4 +1,5 @@
 ﻿using Moq;
+using Moq.Protected;
 
 namespace Demo
 {
